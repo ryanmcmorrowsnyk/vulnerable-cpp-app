@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project(VulnerableCppApp)
+find_package(Boost 1.66 REQUIRED)
+find_package(OpenSSL 1.1.0 REQUIRED)
+add_executable(vulnerable_cpp_app main.cpp)
