@@ -12,8 +12,7 @@
 #include <sqlite3.h>
 #include <openssl/md5.h>
 #include <curl/curl.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+// Boost not available - using standard C++ string splitting instead
 
 // VULNERABILITY: Hardcoded Secrets (CWE-798)
 const char* JWT_SECRET = "super_secret_jwt_key_12345";
@@ -263,15 +262,24 @@ struct HttpRequest {
     std::string body;
 };
 
+// Helper: split string by delimiter (replaces boost::split)
+static void split_string(std::vector<std::string>& tokens, const std::string& s, char delim) {
+    std::stringstream ss(s);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        tokens.push_back(token);
+    }
+}
+
 // Parse query string
 std::map<std::string, std::string> parse_query_string(const std::string& query) {
     std::map<std::string, std::string> params;
     std::vector<std::string> pairs;
-    boost::split(pairs, query, boost::is_any_of("&"));
+    split_string(pairs, query, '&');
 
     for (const auto& pair : pairs) {
         std::vector<std::string> kv;
-        boost::split(kv, pair, boost::is_any_of("="));
+        split_string(kv, pair, '=');
         if (kv.size() == 2) {
             params[kv[0]] = kv[1];
         }
